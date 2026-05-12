@@ -1,0 +1,16 @@
+.stage {
+  display: grid;
+  place-items: center;
+  width: 180px;
+  height: 180px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 42%, #ffffff 0%, #eef6ff 58%, #dbeafe 100%);
+  overflow: hidden;
+}
+
+.canvas {
+  width: 180px;
+  height: 180px;
+  image-rendering: pixelated;
+}

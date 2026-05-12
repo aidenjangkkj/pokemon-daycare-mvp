@@ -1,0 +1,15 @@
+export type {
+  CareActionType,
+  CareStat,
+  Grade,
+  MetaProgress,
+  PetState,
+  RequestCard,
+  RunEndType,
+  RunHistory,
+  RunRecord,
+  RunReward,
+  RunState,
+  Stage,
+  Theme,
+} from "../../../shared/types/game";
