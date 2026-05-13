@@ -1,4 +1,13 @@
 import type { RunRecord } from "../../shared/types/game";
+import { Button as BitButton } from "@/components/ui/8bit/button";
+import { Block } from "@/components/ui/8bit/block";
+import { Badge as BitBadge } from "@/components/ui/8bit/badge";
+import {
+  Card as BitCard,
+  CardContent as BitCardContent,
+  CardHeader as BitCardHeader,
+  CardTitle as BitCardTitle,
+} from "@/components/ui/8bit/card";
 import styles from "./ResultModal.module.css";
 
 interface ResultModalProps {
@@ -17,72 +26,77 @@ function getResultTitle(record: RunRecord): string {
 export function ResultModal({ record, onClose }: ResultModalProps) {
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true">
-      <section className={styles.modal}>
-        <h2>{getResultTitle(record)}</h2>
+      <BitCard className={styles.modal} font="retro">
+        <BitCardHeader>
+          <BitCardTitle>{getResultTitle(record)}</BitCardTitle>
+        </BitCardHeader>
+        <BitCardContent>
 
-        <div className={styles.badge}>등급 {record.grade}</div>
+        <BitBadge className={styles.badge} font="retro">등급 {record.grade}</BitBadge>
 
-        <div className={styles.summary}>
-          <div className={styles.row}>
+        <Block className={styles.summary}>
+          <Block className={styles.row}>
             <span>Species ID</span>
             <strong>{record.speciesId}</strong>
-          </div>
+          </Block>
 
-          <div className={styles.row}>
+          <Block className={styles.row}>
             <span>종료 일수</span>
             <strong>Day {record.endDay}</strong>
-          </div>
+          </Block>
 
-          <div className={styles.row}>
+          <Block className={styles.row}>
             <span>실패 횟수</span>
             <strong>{record.failCount}회</strong>
-          </div>
+          </Block>
 
-          <div className={styles.row}>
+          <Block className={styles.row}>
             <span>평균 상태</span>
             <strong>{record.averageStat.toFixed(1)}</strong>
-          </div>
+          </Block>
 
-          <div className={styles.row}>
+          <Block className={styles.row}>
             <span>최종 단계</span>
             <strong>{record.finalStage}</strong>
-          </div>
-        </div>
+          </Block>
+        </Block>
 
         <h3>보상</h3>
 
-        <div className={styles.summary}>
-          <div className={styles.row}>
+        <Block className={styles.summary}>
+          <Block className={styles.row}>
             <span>재화</span>
             <strong>{record.reward.currency}</strong>
-          </div>
+          </Block>
 
-          <div className={styles.row}>
+          <Block className={styles.row}>
             <span>운영 포인트</span>
             <strong>{record.reward.operationPoint}</strong>
-          </div>
+          </Block>
 
-          <div className={styles.row}>
+          <Block className={styles.row}>
             <span>등급 배율</span>
             <strong>x{record.reward.gradeMultiplier}</strong>
-          </div>
+          </Block>
 
-          <div className={styles.row}>
+          <Block className={styles.row}>
             <span>신규 도감 보너스</span>
             <strong>{record.reward.isNewDex ? "적용" : "미적용"}</strong>
-          </div>
-        </div>
+          </Block>
+        </Block>
 
-        <div className={styles.actions}>
-          <button
+        <Block className={styles.actions}>
+          <BitButton
             type="button"
+            font="retro"
             className={styles.button}
             onClick={onClose}
           >
             확인
-          </button>
-        </div>
-      </section>
+          </BitButton>
+        </Block>
+        </BitCardContent>
+      </BitCard>
     </div>
   );
 }

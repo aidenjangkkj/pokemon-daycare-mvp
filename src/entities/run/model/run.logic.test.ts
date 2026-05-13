@@ -3,6 +3,7 @@ import {
   applyDailyDecay,
   canPerformAction,
   createInitialRun,
+  evolveIfReady,
   hatchIfReady,
 } from "./run.logic";
 
@@ -51,5 +52,67 @@ describe("run.logic", () => {
 
     expect(hatched.pet.stage).toBe("juvenile");
     expect(hatched.evolutionHistory).toEqual([1]);
+  });
+
+  it("sets final stage immediately for no-evolution species", () => {
+    const run = createInitialRun(
+      132,
+      ["normal"],
+      20,
+      1,
+      "hardy",
+      "balanced",
+      [],
+      1,
+      [132],
+    );
+    const hatched = hatchIfReady({ ...run, day: 3 });
+    const evolved = evolveIfReady(hatched);
+
+    expect(hatched.pet.stage).toBe("final");
+    expect(hatched.pet.isFinalEvolution).toBe(true);
+    expect(evolved.pet.speciesId).toBe(132);
+  });
+
+  it("handles single-evolution line (2 stages)", () => {
+    const run = createInitialRun(
+      1,
+      ["grass"],
+      20,
+      1,
+      "hardy",
+      "balanced",
+      [],
+      1,
+      [1, 2],
+    );
+    const hatched = hatchIfReady({ ...run, day: 3 });
+    const evolved = evolveIfReady({ ...hatched, day: 7 });
+
+    expect(hatched.pet.stage).toBe("juvenile");
+    expect(evolved.pet.speciesId).toBe(2);
+    expect(evolved.pet.stage).toBe("final");
+  });
+
+  it("handles multi-stage evolution line (3 stages)", () => {
+    const run = createInitialRun(
+      1,
+      ["grass"],
+      20,
+      1,
+      "hardy",
+      "balanced",
+      [],
+      1,
+      [1, 2, 3],
+    );
+    const hatched = hatchIfReady({ ...run, day: 3 });
+    const middle = evolveIfReady({ ...hatched, day: 7 });
+    const final = evolveIfReady({ ...middle, day: 11 });
+
+    expect(middle.pet.speciesId).toBe(2);
+    expect(middle.pet.stage).toBe("juvenile");
+    expect(final.pet.speciesId).toBe(3);
+    expect(final.pet.stage).toBe("final");
   });
 });

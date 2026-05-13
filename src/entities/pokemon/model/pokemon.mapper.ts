@@ -27,6 +27,8 @@ export function mapPokemonSummary(
     speciesId: species.id,
     name: pokemon.name,
     localizedName: findKoreanName(species) ?? pokemon.name,
+    height: pokemon.height,
+    weight: pokemon.weight,
     types: pokemon.types
       .slice()
       .sort((a, b) => a.slot - b.slot)

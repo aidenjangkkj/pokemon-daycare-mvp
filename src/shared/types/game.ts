@@ -34,9 +34,11 @@ export interface RequestCondition {
 
 export interface ExpeditionLog {
   day: number;
+  mode: "auto" | "direct";
   successChance: number;
   success: boolean;
   bonusCurrencyMultiplier: number;
+  bonusItemMultiplier: number;
   bonusOperationPoint: number;
 }
 

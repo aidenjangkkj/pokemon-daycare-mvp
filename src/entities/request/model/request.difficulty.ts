@@ -27,11 +27,9 @@ function getRarityWeight(pokemon: PokemonSummary): number {
 export function calculateRequestDifficulty(
   pokemon: PokemonSummary,
 ): number {
-  const hatchCounterWeight = 1 + pokemon.hatchCounter / 100;
+  const hatchCounterWeight = Number((pokemon.hatchCounter / 10).toFixed(2));
   const evolutionDepthWeight = getEvolutionDepthWeight(pokemon);
   const rarityWeight = getRarityWeight(pokemon);
 
-  return Number(
-    (hatchCounterWeight * evolutionDepthWeight * rarityWeight).toFixed(2),
-  );
+  return Number((hatchCounterWeight + evolutionDepthWeight + rarityWeight).toFixed(2));
 }

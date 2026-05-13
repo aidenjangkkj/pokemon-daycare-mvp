@@ -16,28 +16,73 @@ export function extractSpeciesIdFromUrl(url: string): number | null {
   return Number.isFinite(speciesId) ? speciesId : null;
 }
 
-function flattenFirstEvolutionPath(
+function collectEvolutionPaths(
   node: PokeApiEvolutionChainNode,
-): number[] {
+): number[][] {
   const speciesId = extractSpeciesIdFromUrl(node.species.url);
 
   if (!speciesId) {
     return [];
   }
 
-  const nextNode = node.evolves_to[0];
-
-  if (!nextNode) {
-    return [speciesId];
+  if (node.evolves_to.length === 0) {
+    return [[speciesId]];
   }
 
-  return [speciesId, ...flattenFirstEvolutionPath(nextNode)];
+  const childPaths = node.evolves_to.flatMap((nextNode) =>
+    collectEvolutionPaths(nextNode),
+  );
+
+  return childPaths.map((childPath) => [speciesId, ...childPath]);
+}
+
+function chooseDeterministicPath(paths: number[][]): number[] {
+  return paths
+    .slice()
+    .sort((a, b) => {
+      if (a.length !== b.length) {
+        return b.length - a.length;
+      }
+
+      const aTerminal = a.at(-1) ?? 0;
+      const bTerminal = b.at(-1) ?? 0;
+
+      if (aTerminal !== bTerminal) {
+        return aTerminal - bTerminal;
+      }
+
+      return a.join("-").localeCompare(b.join("-"));
+    })[0] ?? [];
+}
+
+function choosePathIncludingSpecies(
+  paths: number[][],
+  speciesId: number,
+): number[] {
+  const candidatePaths = paths.filter((path) => path.includes(speciesId));
+
+  if (candidatePaths.length === 0) {
+    return [];
+  }
+
+  return chooseDeterministicPath(candidatePaths);
 }
 
 export function getEvolutionLineSpeciesIds(
   evolutionChain: PokeApiEvolutionChain,
+  selectedSpeciesId?: number,
 ): number[] {
-  return flattenFirstEvolutionPath(evolutionChain.chain);
+  const allPaths = collectEvolutionPaths(evolutionChain.chain);
+
+  if (allPaths.length === 0) {
+    return [];
+  }
+
+  if (typeof selectedSpeciesId === "number") {
+    return choosePathIncludingSpecies(allPaths, selectedSpeciesId);
+  }
+
+  return chooseDeterministicPath(allPaths);
 }
 
 export function getCurrentEvolutionIndex(

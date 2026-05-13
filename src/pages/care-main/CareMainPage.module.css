@@ -1,113 +1,240 @@
 .page {
   min-height: 100vh;
-  padding: 24px;
-  background: #f8fbff;
-  color: #1f2933;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at 40% 10%, #13224b 0%, #080f25 50%, #040914 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.title {
-  margin: 0 0 24px;
-  font-size: 32px;
+.canvas {
+  width: min(100vw, 1448px);
+  aspect-ratio: 1448 / 1086;
+  box-sizing: border-box;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  grid-template-rows: 110px 1fr 110px 90px;
+  gap: 12px;
 }
 
-.section {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #dbe7f3;
-  border-radius: 20px;
-  background: white;
+.topBar,
+.leftPanel,
+.rightPanel,
+.room,
+.log {
+  border: 4px solid #b06b2a;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 2px #2c1409;
 }
 
-.sectionTitle {
-  margin: 0 0 16px;
-  font-size: 22px;
+.topBar {
+  grid-column: 1 / 4;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr 0.8fr;
+  gap: 10px;
+  padding: 10px;
+  background: linear-gradient(90deg, #0a122c 0%, #111f44 35%, #0a122c 100%);
 }
 
-.petPanel {
+.topCell {
   display: flex;
   align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
+  justify-content: center;
+  color: #f2e7c7;
+  font-family: 'DungGeunMo', 'NeoDunggeunmo', monospace;
+  font-size: clamp(22px, 1.8vw, 34px);
+  font-weight: 700;
+  text-shadow: 2px 2px 0 #2a1309;
 }
 
-.spriteFrame {
+.leftPanel,
+.rightPanel {
+  background: linear-gradient(90deg, #0a122c 0%, #111f44 35%, #0a122c 100%);
+  padding: 18px;
+}
+
+.leftPanel {
+  grid-column: 1;
+  grid-row: 2;
   display: grid;
-  place-items: center;
-  width: 180px;
-  height: 180px;
-  border-radius: 24px;
-  background: #eef6ff;
+  grid-template-columns: 1fr;
+  grid-auto-rows: min-content;
+  gap: 10px;
 }
 
-.sprite {
-  width: 160px;
-  height: 160px;
-  object-fit: contain;
+.metaLabel {
+  color: #f2e7c7;
+  font-family: 'DungGeunMo', 'NeoDunggeunmo', monospace;
+  font-size: clamp(22px, 1.7vw, 30px);
+  font-weight: 700;
+  text-shadow: 2px 2px 0 #2a1309;
 }
 
-.pixelSprite {
+.metaValue {
+  background: #efe2c3;
+  color: #2d1a10;
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+  font-family: 'DungGeunMo', 'NeoDunggeunmo', monospace;
+  font-size: clamp(20px, 1.5vw, 28px);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaValueBlue {
+  background: #3a8ada;
+  color: #f7f0d5;
+}
+
+.room {
+  grid-column: 2;
+  grid-row: 2;
+  background: linear-gradient(180deg, #d9b88c 0%, #caa173 65%, #9f7048 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.windowFrame {
+  position: absolute;
+  left: 15%;
+  top: 8%;
+  width: 70%;
+  height: 38%;
+  border: 12px solid #7a421a;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #7ecfff 0%, #4db0e8 100%);
+}
+
+.rug {
+  position: absolute;
+  left: 18%;
+  bottom: 6%;
+  width: 64%;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #9aa549 0%, #7f8f3d 55%, #6f7d34 100%);
+  box-shadow: inset 0 0 0 10px #b7b15d;
+}
+
+.spriteArea {
+  position: absolute;
+  left: 34%;
+  bottom: 12%;
+  width: 32%;
+  height: 24%;
+}
+
+.spriteStage {
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+}
+
+.spriteStage :global(.canvas) {
+  width: 100% !important;
+  height: 100% !important;
   image-rendering: pixelated;
 }
 
-.infoList {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-}
-
-.statList {
-  display: grid;
-  gap: 8px;
-  padding-left: 20px;
-}
-
-.actionGrid {
+.rightPanel {
+  grid-column: 3;
+  grid-row: 2;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
-.button {
-  min-height: 38px;
-  border: 0;
-  border-radius: 12px;
-  padding: 8px 14px;
-  background: #4c6ef5;
-  color: white;
+.statRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #f2e7c7;
+  font-family: 'DungGeunMo', 'NeoDunggeunmo', monospace;
+  font-size: clamp(22px, 1.6vw, 30px);
   font-weight: 700;
-  cursor: pointer;
+  text-shadow: 2px 2px 0 #2a1309;
 }
 
-.button:disabled {
-  opacity: 0.45;
+.actionRow {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.footerRow {
+  grid-column: 1 / 4;
+  grid-row: 4;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+}
+
+.actionBtn {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #f7f0d6;
+  font-family: 'Press Start 2P', 'DungGeunMo', monospace;
+  font-size: clamp(26px, 1.9vw, 36px);
+  font-weight: 700;
+  text-shadow: 2px 2px 0 #2a1309;
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+  padding: 0.5rem 0.75rem !important;
+}
+
+.actionBtn:disabled {
+  filter: grayscale(0.45) brightness(0.8);
   cursor: not-allowed;
 }
 
-.buttonDanger {
-  min-height: 38px;
-  border: 0;
-  border-radius: 12px;
-  padding: 8px 14px;
-  background: #e03131;
-  color: white;
+.red { background: linear-gradient(180deg, #d95357 0%, #b53e44 100%); }
+.green { background: linear-gradient(180deg, #72b840 0%, #4f912b 100%); }
+.yellow { background: linear-gradient(180deg, #e5b83a 0%, #cb9823 100%); }
+.blue { background: linear-gradient(180deg, #66b7d8 0%, #3f8cae 100%); }
+.purple { background: linear-gradient(180deg, #a97ac6 0%, #8a5ca9 100%); }
+.orange { background: linear-gradient(180deg, #df8d3a 0%, #c96e1f 100%); }
+.danger { background: linear-gradient(180deg, #c95f5b 0%, #a6403b 100%); }
+
+.bigBtn,
+.smallBtn {
+  width: 100%;
+  height: 100%;
+}
+
+.log {
+  width: min(100vw, 1448px);
+  box-sizing: border-box;
+  margin-top: 8px;
+  padding: 16px 24px;
+  background: linear-gradient(90deg, #0a122c 0%, #111f44 35%, #0a122c 100%);
+  color: #f2e7c4;
+  font-family: 'DungGeunMo', 'NeoDunggeunmo', monospace;
+  font-size: clamp(26px, 2vw, 42px);
   font-weight: 700;
-  cursor: pointer;
 }
 
-.buttonRow {
-  display: flex;
-  gap: 8px;
-  margin-top: 16px;
+.log p {
+  margin: 0;
 }
 
-.historyList {
-  padding-left: 20px;
-}
+@media (max-width: 1024px) {
+  .canvas {
+    grid-template-columns: 250px 1fr 250px;
+    grid-template-rows: 90px 1fr 92px 74px;
+    gap: 8px;
+    padding: 8px;
+  }
 
-.statusText {
-  color: #607080;
-}
-
-.errorText {
-  color: #c92a2a;
+  .actionBtn {
+    font-size: clamp(18px, 2.2vw, 26px);
+  }
 }

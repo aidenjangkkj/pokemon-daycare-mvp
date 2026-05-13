@@ -23,3 +23,21 @@ export function createRequestHints(pokemon: PokemonSummary): string[] {
     `부화 부담도: ${getHatchDifficultyLabel(pokemon.turnsToHatch)}`,
   ];
 }
+
+export function createProgressiveRequestHints(
+  pokemon: PokemonSummary,
+  registeredSpeciesCount: number,
+): string[] {
+  const hints = createRequestHints(pokemon);
+
+  if (registeredSpeciesCount >= 15) {
+    hints.push(`키 단서: ${pokemon.height}`);
+    hints.push(`몸무게 단서: ${pokemon.weight}`);
+  }
+
+  if (registeredSpeciesCount >= 50) {
+    hints.push("진화 단계 단서: 기본형");
+  }
+
+  return hints;
+}

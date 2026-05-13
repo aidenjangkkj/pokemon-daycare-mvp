@@ -3,6 +3,9 @@ import type {
   RunRecord,
   RunReward,
 } from "../../shared/types/game";
+import { Button as BitButton } from "@/components/ui/8bit/button";
+import { Block } from "@/components/ui/8bit/block";
+import { Card as BitCard, CardContent as BitCardContent, CardHeader as BitCardHeader, CardTitle as BitCardTitle } from "@/components/ui/8bit/card";
 import styles from "./RecordsPage.module.css";
 
 interface RecordsPageProps {
@@ -72,12 +75,14 @@ function RunRecordList({
 
             return (
               <li key={`${record.runId}-${record.endedAt}`}>
-                Species #{record.speciesId} / 등급 {record.grade} / Day{" "}
-                {record.endDay} / 실패 {record.failCount}회 / 평균 상태{" "}
-                {record.averageStat.toFixed(1)} / 진화 이력{" "}
-                {getEvolutionHistoryText(record)} / 재화 {reward.currency} /
-                운영 포인트 {reward.operationPoint} /{" "}
-                {formatDateTime(record.endedAt)}
+                <Block>
+                  Species #{record.speciesId} / 등급 {record.grade} / Day{" "}
+                  {record.endDay} / 실패 {record.failCount}회 / 평균 상태{" "}
+                  {record.averageStat.toFixed(1)} / 진화 이력{" "}
+                  {getEvolutionHistoryText(record)} / 재화 {reward.currency} /
+                  운영 포인트 {reward.operationPoint} /{" "}
+                  {formatDateTime(record.endedAt)}
+                </Block>
               </li>
             );
           })}
@@ -93,19 +98,24 @@ export function RecordsPage({
   onResetRecords,
 }: RecordsPageProps) {
   return (
-    <section className={styles.section}>
-      <h2 className={styles.title}>기록</h2>
+    <BitCard className={styles.section} font="retro">
+      <BitCardHeader>
+        <BitCardTitle className={styles.title}>기록</BitCardTitle>
+      </BitCardHeader>
+      <BitCardContent>
 
-      <button
+      <BitButton
         type="button"
+        font="retro"
         className={styles.button}
         onClick={onResetRecords}
       >
         기록 초기화
-      </button>
+      </BitButton>
 
       <RunRecordList title="클리어 기록" records={clearedRuns} />
       <RunRecordList title="휴양 전환 기록" records={restRuns} />
-    </section>
+      </BitCardContent>
+    </BitCard>
   );
 }

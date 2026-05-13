@@ -29,6 +29,8 @@ const waterPokemon: PokemonSummary = {
   speciesId: 7,
   name: "squirtle",
   localizedName: "꼬부기",
+  height: 5,
+  weight: 90,
   types: ["water"],
   spriteUrl: null,
   habitat: "waters-edge",

@@ -85,6 +85,23 @@ export function createInitialRun(
 }
 
 export function normalizeRunState(run: RunState): RunState {
+  const safeEvolutionLineSpeciesIds =
+    run.evolutionLineSpeciesIds?.length > 0
+      ? run.evolutionLineSpeciesIds
+      : [run.pet.speciesId];
+  const currentEvolutionIndex = safeEvolutionLineSpeciesIds.findIndex(
+    (speciesId) => speciesId === run.pet.speciesId,
+  );
+  const isFinalByLine =
+    safeEvolutionLineSpeciesIds.length <= 1 ||
+    currentEvolutionIndex === safeEvolutionLineSpeciesIds.length - 1;
+  const safeEvolutionHistory =
+    run.pet.stage === "egg"
+      ? run.evolutionHistory ?? []
+      : run.evolutionHistory?.length
+        ? run.evolutionHistory
+        : [run.pet.speciesId];
+
   return {
     ...run,
     pet: {
@@ -93,19 +110,29 @@ export function normalizeRunState(run: RunState): RunState {
       natureId: run.pet.natureId ?? 1,
       natureName: run.pet.natureName ?? "hardy",
       natureDisposition: run.pet.natureDisposition ?? "balanced",
+      stage:
+        run.pet.stage === "egg"
+          ? "egg"
+          : isFinalByLine
+            ? "final"
+            : "juvenile",
+      isFinalEvolution:
+        run.pet.stage === "egg" ? false : isFinalByLine,
     },
-    evolutionLineSpeciesIds:
-      run.evolutionLineSpeciesIds?.length > 0
-        ? run.evolutionLineSpeciesIds
-        : [run.pet.speciesId],
+    evolutionLineSpeciesIds: safeEvolutionLineSpeciesIds,
     request: {
       ...run.request,
       requiredConditions: run.request.requiredConditions ?? [],
       difficulty: run.request.difficulty ?? 1,
     },
-    evolutionHistory: run.evolutionHistory ?? [],
+    evolutionHistory: safeEvolutionHistory,
     turnsToHatch: run.turnsToHatch ?? 20,
-    expeditionLogs: run.expeditionLogs ?? [],
+    expeditionLogs:
+      run.expeditionLogs?.map((log) => ({
+        ...log,
+        mode: log.mode ?? "auto",
+        bonusItemMultiplier: log.bonusItemMultiplier ?? 1,
+      })) ?? [],
   };
 }
 

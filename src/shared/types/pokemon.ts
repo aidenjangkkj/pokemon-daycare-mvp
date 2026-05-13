@@ -3,6 +3,8 @@ import type { PokeApiNamedResource } from "./api";
 export interface PokeApiPokemon {
   id: number;
   name: string;
+  height: number;
+  weight: number;
   types: PokeApiPokemonTypeSlot[];
   sprites: PokeApiPokemonSprites;
   species: PokeApiNamedResource;
@@ -26,6 +28,7 @@ export interface PokeApiPokemonSprites {
 export interface PokeApiPokemonSpecies {
   id: number;
   name: string;
+  evolves_from_species: PokeApiNamedResource | null;
   is_baby: boolean;
   is_legendary: boolean;
   is_mythical: boolean;
@@ -80,6 +83,8 @@ export interface PokemonSummary {
   speciesId: number;
   name: string;
   localizedName: string;
+  height: number;
+  weight: number;
   types: string[];
   spriteUrl: string | null;
   habitat: string | null;

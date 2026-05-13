@@ -1,0 +1,103 @@
+- main [ref=e3]:
+  - generic [ref=e4]:
+    - heading "포켓몬 키우미 집 MVP" [level=1] [ref=e5]
+    - paragraph [ref=e6]: 의뢰 게시판에서 알 의뢰 1건을 수락하세요.
+  - generic [ref=e7]:
+    - heading "도감 / 해금" [level=2] [ref=e8]
+    - paragraph [ref=e9]: "등록 종 수: 0"
+    - paragraph [ref=e10]: "최근 10런 평균 실패 횟수: 0.00"
+    - paragraph [ref=e11]: "최근 등장 종: 없음"
+    - paragraph [ref=e12]: "평판: 0"
+    - paragraph [ref=e13]: "운영 포인트: 0"
+    - paragraph [ref=e14]: "해금 Tier: 0"
+  - generic [ref=e15]:
+    - heading "환경 운영" [level=2] [ref=e16]
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - text: 기본 테마
+        - combobox "기본 테마" [ref=e19]:
+          - option "숲" [selected]
+          - option "수변"
+          - option "화산"
+          - option "동굴"
+          - option "도심"
+          - option "하늘"
+      - generic [ref=e20]:
+        - text: 보조 테마
+        - combobox "보조 테마" [ref=e21]:
+          - option "없음" [selected]
+          - option "수변"
+          - option "화산"
+          - option "동굴"
+          - option "도심"
+          - option "하늘"
+      - generic [ref=e22]:
+        - text: 먹이 프로필
+        - combobox "먹이 프로필" [ref=e23]:
+          - option "균형식" [selected]
+          - option "단백질식"
+          - option "달콤식"
+          - option "신선식"
+      - generic [ref=e24]:
+        - text: 청결 밴드
+        - combobox "청결 밴드" [ref=e25]:
+          - option "low"
+          - option "mid" [selected]
+          - option "high"
+    - heading "시설 레벨" [level=3] [ref=e26]
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - text: 숲
+        - combobox "숲" [ref=e29]:
+          - option "Lv.0"
+          - option "Lv.1" [selected]
+          - option "Lv.2"
+          - option "Lv.3"
+      - generic [ref=e30]:
+        - text: 수변
+        - combobox "수변" [ref=e31]:
+          - option "Lv.0" [selected]
+          - option "Lv.1"
+          - option "Lv.2"
+          - option "Lv.3"
+      - generic [ref=e32]:
+        - text: 화산
+        - combobox "화산" [ref=e33]:
+          - option "Lv.0" [selected]
+          - option "Lv.1"
+          - option "Lv.2"
+          - option "Lv.3"
+      - generic [ref=e34]:
+        - text: 동굴
+        - combobox "동굴" [ref=e35]:
+          - option "Lv.0" [selected]
+          - option "Lv.1"
+          - option "Lv.2"
+          - option "Lv.3"
+      - generic [ref=e36]:
+        - text: 도심
+        - combobox "도심" [ref=e37]:
+          - option "Lv.0" [selected]
+          - option "Lv.1"
+          - option "Lv.2"
+          - option "Lv.3"
+      - generic [ref=e38]:
+        - text: 하늘
+        - combobox "하늘" [ref=e39]:
+          - option "Lv.0" [selected]
+          - option "Lv.1"
+          - option "Lv.2"
+          - option "Lv.3"
+    - button "환경 초기화" [ref=e40] [cursor=pointer]
+  - generic [ref=e41]:
+    - heading "의뢰 게시판" [level=2] [ref=e42]
+    - paragraph [ref=e43]: 1세대 의뢰 후보를 불러오는 중입니다...
+  - generic [ref=e44]:
+    - heading "기록" [level=2] [ref=e45]
+    - button "기록 초기화" [ref=e46] [cursor=pointer]
+    - generic [ref=e47]:
+      - heading "클리어 기록" [level=3] [ref=e48]
+      - paragraph [ref=e49]: 아직 기록이 없습니다.
+    - generic [ref=e50]:
+      - heading "휴양 전환 기록" [level=3] [ref=e51]
+      - paragraph [ref=e52]: 아직 기록이 없습니다.

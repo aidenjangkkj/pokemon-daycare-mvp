@@ -1,4 +1,5 @@
 import {
+  ACTION_ITEM_MODIFIER_MAP,
   CONSECUTIVE_ACTION_PENALTY_MULTIPLIER,
   NATURE_ACTION_MODIFIER_MAP,
   STAGE_EFFICIENCY_MAP,
@@ -63,6 +64,12 @@ export function applyActionModifiers(
 
   if (natureModifier) {
     nextDelta = mergeDelta(nextDelta, natureModifier);
+  }
+
+  const itemModifier = ACTION_ITEM_MODIFIER_MAP[context.action];
+
+  if (itemModifier) {
+    nextDelta = mergeDelta(nextDelta, itemModifier);
   }
 
   const consecutiveMultiplier = getConsecutiveActionMultiplier(

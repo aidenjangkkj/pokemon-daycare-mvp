@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d2ad7b"/>
+      <stop offset="1" stop-color="#c29563"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9f6b3f"/>
+      <stop offset="1" stop-color="#7b4b28"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#84d7ff"/>
+      <stop offset="1" stop-color="#5db6ea"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="768" fill="url(#wall)"/>
+  <rect y="540" width="1024" height="228" fill="url(#floor)"/>
+  <rect y="530" width="1024" height="10" fill="#6a3d1f"/>
+
+  <rect x="240" y="92" width="544" height="336" fill="#7a421a"/>
+  <rect x="270" y="122" width="484" height="276" fill="url(#sky)"/>
+  <rect x="504" y="92" width="16" height="336" fill="#7a421a"/>
+  <rect x="240" y="416" width="544" height="12" fill="#7a421a"/>
+
+  <rect x="224" y="88" width="20" height="352" fill="#5f3117"/>
+  <rect x="780" y="88" width="20" height="352" fill="#5f3117"/>
+
+  <rect x="270" y="122" width="484" height="18" fill="#90dcff" opacity="0.35"/>
+
+  <g fill="#6db55b" opacity="0.92">
+    <rect x="288" y="354" width="36" height="24"/>
+    <rect x="332" y="344" width="28" height="34"/>
+    <rect x="388" y="348" width="32" height="30"/>
+    <rect x="612" y="354" width="36" height="24"/>
+    <rect x="662" y="344" width="28" height="34"/>
+    <rect x="704" y="350" width="26" height="28"/>
+  </g>
+
+  <rect x="130" y="385" width="180" height="150" fill="#714224"/>
+  <rect x="130" y="414" width="180" height="10" fill="#5a3318"/>
+  <rect x="714" y="385" width="180" height="150" fill="#714224"/>
+  <rect x="714" y="414" width="180" height="10" fill="#5a3318"/>
+
+  <rect x="810" y="190" width="82" height="100" fill="#8a5a32"/>
+  <rect x="818" y="198" width="66" height="84" fill="#f0ca7f"/>
+
+  <circle cx="787" cy="132" r="44" fill="#7f5a3a"/>
+  <circle cx="787" cy="132" r="38" fill="#dcc598"/>
+  <line x1="787" y1="132" x2="787" y2="106" stroke="#6a4a2f" stroke-width="4"/>
+  <line x1="787" y1="132" x2="808" y2="140" stroke="#6a4a2f" stroke-width="4"/>
+
+  <rect x="300" y="560" width="424" height="152" fill="#7c8f3f"/>
+  <rect x="332" y="582" width="360" height="108" fill="#9cae57"/>
+</svg>

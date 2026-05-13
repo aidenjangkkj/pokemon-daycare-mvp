@@ -25,18 +25,24 @@ export function calculateExpeditionResult(
     0.05,
     0.95,
   );
-  const success = Math.random() < successChance;
+  const success =
+    input.mode === "direct"
+      ? Boolean(input.miniGameSuccess)
+      : Math.random() < successChance;
 
   const natureCurrencyBonus =
     input.natureDisposition === "active" ? 0.1 : 0;
-  const natureOperationBonus =
-    input.natureDisposition === "stable" ? 1 : 0;
+  const natureItemBonus =
+    input.natureDisposition === "stable" ? 0.1 : 0;
+  const natureOperationBonus = input.natureDisposition === "stable" ? 1 : 0;
 
   return {
     successChance,
     success,
     bonusCurrencyMultiplier:
       (matchedTheme ? 1.1 : 1) * (1 + natureCurrencyBonus),
+    bonusItemMultiplier:
+      (matchedTheme ? 1.2 : 1) * (1 + natureItemBonus),
     bonusOperationPoint: natureOperationBonus,
   };
 }

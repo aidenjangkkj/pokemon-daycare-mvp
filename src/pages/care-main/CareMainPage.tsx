@@ -1,19 +1,22 @@
-import type {
-  CareActionType,
-  CareStat,
-  RunState,
-} from "../../shared/types/game";
+import type { CareActionType, RunState, Theme } from "../../shared/types/game";
 import type { PokemonSummary } from "../../shared/types/pokemon";
-import {
-  CARE_ACTION_LABELS,
-  CARE_ACTIONS,
-  CARE_STAT_LABELS,
-  CARE_STATS,
-} from "../../shared/constants/ui";
+import type { DaycareEnvironment } from "../../entities/request/model/request.types";
+import type {
+  CleanlinessBand,
+  FacilityLevel,
+  FoodProfile,
+} from "../../shared/constants/theme";
+import { FOOD_PROFILE_LABEL_MAP, THEME_LABEL_MAP } from "../../shared/constants/theme";
+import { CLEANLINESS_BAND_OPTIONS, FACILITY_LEVEL_OPTIONS, FOOD_PROFILE_OPTIONS, THEME_OPTIONS } from "../../shared/constants/ui";
 import { PixiPetStage } from "../../widgets/pixi-stage/PixiPetStage";
-import styles from "./CareMainPage.module.css";
-
-const EGG_IMAGE_SRC = "/assets/pokemon-egg.svg";
+import { StatusPanel } from "../../widgets/status-panel/StatusPanel";
+import { Block } from "@/components/ui/8bit/block";
+import { Button as BitButton } from "@/components/ui/8bit/button";
+import {
+  Card as BitCard,
+  CardContent as BitCardContent,
+} from "@/components/ui/8bit/card";
+import { Select as BitSelect, SelectContent as BitSelectContent, SelectItem as BitSelectItem, SelectTrigger as BitSelectTrigger, SelectValue as BitSelectValue } from "@/components/ui/8bit/select";
 
 interface CareMainPageProps {
   currentRun: RunState;
@@ -24,6 +27,12 @@ interface CareMainPageProps {
   isPokemonLoading: boolean;
   isPokemonError: boolean;
   pokemonError: unknown;
+  environment: DaycareEnvironment;
+  onSetThemePrimary: (theme: Theme) => void;
+  onSetThemeSecondary: (theme: Theme | null) => void;
+  onSetFoodProfile: (foodProfile: FoodProfile) => void;
+  onSetCleanlinessBand: (cleanlinessBand: CleanlinessBand) => void;
+  onSetFacilityLevel: (theme: Theme, level: FacilityLevel) => void;
   onPerformAction: (action: CareActionType) => void;
   onEndDay: () => void;
   onFinishRun: () => void;
@@ -31,17 +40,22 @@ interface CareMainPageProps {
 }
 
 function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
+  if (error instanceof Error) return error.message;
   return "알 수 없는 오류가 발생했습니다.";
 }
 
-function getEvolutionHistoryText(currentRun: RunState): string {
-  return currentRun.evolutionHistory.length > 0
-    ? currentRun.evolutionHistory.join(" → ")
-    : "없음";
+function getStageLabel(stage: RunState["pet"]["stage"]): string {
+  if (stage === "egg") return "알";
+  if (stage === "juvenile") return "유년기";
+  return "최종";
+}
+
+function parseFacilityLevel(value: string): FacilityLevel {
+  const parsed = Number(value);
+  if (FACILITY_LEVEL_OPTIONS.some((level) => level === parsed)) {
+    return parsed as FacilityLevel;
+  }
+  return 0;
 }
 
 export function CareMainPage({
@@ -53,161 +67,133 @@ export function CareMainPage({
   isPokemonLoading,
   isPokemonError,
   pokemonError,
+  environment,
+  onSetThemePrimary,
+  onSetThemeSecondary,
+  onSetFoodProfile,
+  onSetCleanlinessBand,
+  onSetFacilityLevel,
   onPerformAction,
   onEndDay,
   onFinishRun,
   onClearRun,
 }: CareMainPageProps) {
-  const isEggStage = currentRun.pet.stage === "egg";
   const isFinalEvolution = currentRun.pet.isFinalEvolution;
-
-  const displayImageSrc = isEggStage
-    ? EGG_IMAGE_SRC
-    : pokemonSummary?.spriteUrl ?? null;
-
-  const displayImageAlt = isEggStage
-    ? "포켓몬 알"
-    : pokemonSummary?.localizedName ?? "포켓몬";
+  const imageSrc = pokemonSummary?.spriteUrl ?? null;
 
   return (
-    <main className={styles.page}>
-      <h1 className={styles.title}>포켓몬 키우미 집 MVP</h1>
+    <main className="min-h-screen bg-background text-foreground flex flex-col items-center p-2">
+      <section className="w-full max-w-[1448px] aspect-[1448/1086] p-3 grid grid-cols-[320px_1fr_320px] grid-rows-[110px_1fr_110px_90px] gap-3">
+        <BitCard className="col-span-3 bg-card text-card-foreground border-border" font="retro">
+          <BitCardContent className="grid grid-cols-[1.2fr_1fr_1fr_1fr_0.8fr] gap-2 p-2!">
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">DAY {currentRun.day}</Block>
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">{"♥".repeat(Math.max(0, 3 - currentRun.failCount))}</Block>
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">{actionsToday} / 2</Block>
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">{expeditionCountToday} / 1</Block>
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">{currentRun.weeklyCarePoint * 15}</Block>
+          </BitCardContent>
+        </BitCard>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>현재 의뢰</h2>
+        <BitCard className="bg-card text-card-foreground border-border" font="retro">
+          <BitCardContent className="p-4! grid gap-2">
+            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">이름</Block>
+            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">{pokemonSummary?.localizedName ?? "???"}</Block>
+            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">레벨</Block>
+            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">Lv. {Math.min(99, currentRun.day)}</Block>
+            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">타입</Block>
+            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">{pokemonSummary?.types.join(" / ") ?? "???"}</Block>
+            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">상태</Block>
+            <Block className="bg-primary text-primary-foreground px-3 py-2 font-bold truncate">{getStageLabel(currentRun.pet.stage)}</Block>
+          </BitCardContent>
+        </BitCard>
 
-        {isPokemonLoading && (
-          <p className={styles.statusText}>PokeAPI 조회 중...</p>
-        )}
-
-        {isPokemonError && (
-          <p className={styles.errorText}>
-            포켓몬 정보를 불러오지 못했습니다.{" "}
-            {getErrorMessage(pokemonError)}
-          </p>
-        )}
-
-        {pokemonSummary && (
-          <div className={styles.petPanel}>
-            {displayImageSrc && (
+        <section
+          className="relative overflow-hidden border-4 border-border shadow-[inset_0_0_0_2px_#2c1409] bg-center bg-cover"
+          style={{
+            backgroundImage:
+              "url('/assets/room-bg-generated.svg')",
+          }}
+        >
+          <Block
+            className="absolute left-[16%] bottom-[7%] w-[68%] h-[32%] bg-center bg-contain bg-no-repeat"
+            style={{
+              backgroundImage: "url('/assets/rug-generated.svg')",
+            }}
+          />
+          <Block className="absolute left-[34%] bottom-[12%] w-[32%] h-[24%]">
+            {imageSrc && (
               <PixiPetStage
-                imageSrc={displayImageSrc}
-                alt={displayImageAlt}
-                isPixelArt={!isEggStage}
+                imageSrc={imageSrc}
+                alt={pokemonSummary?.localizedName ?? "pokemon"}
+                isPixelArt
+                className="w-full h-full bg-transparent!"
+                transparentBackground
               />
             )}
+          </Block>
+        </section>
 
-            <div className={styles.infoList}>
-              <p>이름: {isEggStage ? "알" : pokemonSummary.localizedName}</p>
-              <p>현재 계열 포켓몬: {pokemonSummary.localizedName}</p>
-              <p>영문명: {pokemonSummary.name}</p>
-              <p>타입: {pokemonSummary.types.join(" / ")}</p>
-              <p>서식지: {pokemonSummary.habitat ?? "unknown"}</p>
-              <p>부화 턴: {pokemonSummary.turnsToHatch}</p>
+        <BitCard className="bg-card text-card-foreground border-border" font="retro">
+          <BitCardContent className="p-4! flex flex-col justify-around gap-2">
+            <StatusPanel label="체력" value={currentRun.pet.hunger} colorClassName="bg-lime-500" />
+            <StatusPanel label="기분" value={currentRun.pet.mood} colorClassName="bg-amber-400" />
+            <StatusPanel label="에너지" value={currentRun.pet.energy} colorClassName="bg-yellow-400" />
+            <StatusPanel label="청결" value={currentRun.pet.cleanliness} colorClassName="bg-sky-500" />
+            <StatusPanel label="휴식" value={Math.max(0, 100 - currentRun.failCount * 10)} colorClassName="bg-purple-500" />
+          </BitCardContent>
+        </BitCard>
 
-              {isFinalEvolution && (
-                <p>
-                  최종 진화 달성! 최종 진화체를 확인한 뒤 결과를 확인하세요.
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-      </section>
+        <section className="col-span-3 grid grid-cols-5 gap-2">
+          <BitButton font="retro" className="w-full h-full bg-red-500 text-white rounded-none" onClick={() => onPerformAction("feedBerry")} disabled={isRestMode || isFinalEvolution}>먹이 주기</BitButton>
+          <BitButton font="retro" className="w-full h-full bg-green-600 text-white rounded-none" onClick={() => onPerformAction("trainMove")} disabled={isRestMode || isFinalEvolution}>놀아주기</BitButton>
+          <BitButton font="retro" className="w-full h-full bg-amber-500 text-white rounded-none" onClick={() => onPerformAction("brushCare")} disabled={isRestMode || isFinalEvolution}>씻기기</BitButton>
+          <BitButton font="retro" className="w-full h-full bg-sky-500 text-white rounded-none" onClick={() => onPerformAction("rest")} disabled={isRestMode || isFinalEvolution}>쉬게 하기</BitButton>
+          <BitButton font="retro" className="w-full h-full bg-purple-500 text-white rounded-none" onClick={() => onPerformAction("expedition")} disabled={isRestMode || isFinalEvolution}>탐험 보내기</BitButton>
+        </section>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>현재 런</h2>
-        <p>Day: {currentRun.day}</p>
-        <p>Species ID: {currentRun.pet.speciesId}</p>
-        <p>Evolution Line: {currentRun.evolutionLineSpeciesIds.join(" → ")}</p>
-        <p>Evolution History: {getEvolutionHistoryText(currentRun)}</p>
-        <p>Stage: {currentRun.pet.stage}</p>
-        <p>Fail Count: {currentRun.failCount}</p>
-        <p>Weekly Care Point: {currentRun.weeklyCarePoint}</p>
-        <p>Actions Today: {actionsToday} / 2</p>
-        <p>Expedition Today: {expeditionCountToday} / 1</p>
-        <p>휴양 모드: {isRestMode ? "진입" : "미진입"}</p>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>상태값</h2>
-
-        <ul className={styles.statList}>
-          {CARE_STATS.map((stat: CareStat) => (
-            <li key={stat}>
-              {CARE_STAT_LABELS[stat]}: {currentRun.pet[stat]}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>액션</h2>
-
-        {isFinalEvolution ? (
-          <p className={styles.statusText}>
-            최종 진화체 확인 중입니다. 결과 확인을 누르면 런이 종료됩니다.
-          </p>
-        ) : (
-          <p className={styles.statusText}>
-            알 단계에서는 휴식 유도만 적용됩니다.
-          </p>
-        )}
-
-        <div className={styles.actionGrid}>
-          {CARE_ACTIONS.map((action) => (
-            <button
-              key={action}
-              type="button"
-              className={styles.button}
-              disabled={isRestMode || isFinalEvolution}
-              onClick={() => onPerformAction(action)}
-            >
-              {CARE_ACTION_LABELS[action]}
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.buttonRow}>
+        <section className="col-span-3 grid grid-cols-[2fr_1fr] gap-2">
           {isFinalEvolution ? (
-            <button
-              type="button"
-              className={styles.button}
-              onClick={onFinishRun}
-            >
-              결과 확인
-            </button>
+            <BitButton font="retro" className="w-full h-full bg-orange-500 text-white rounded-none" onClick={onFinishRun}>결과 확인</BitButton>
           ) : (
-            <button
-              type="button"
-              className={styles.button}
-              disabled={isRestMode}
-              onClick={onEndDay}
-            >
-              하루 종료
-            </button>
+            <BitButton font="retro" className="w-full h-full bg-orange-500 text-white rounded-none" onClick={onEndDay} disabled={isRestMode}>하루 종료</BitButton>
           )}
-
-          <button
-            type="button"
-            className={styles.buttonDanger}
-            onClick={onClearRun}
-          >
-            런 포기
-          </button>
-        </div>
+          <BitButton font="retro" className="w-full h-full bg-red-700 text-white rounded-none" onClick={onClearRun}>런 포기</BitButton>
+        </section>
       </section>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>히스토리</h2>
+      <section className="w-full max-w-[1448px] mt-2 p-3 border-4 border-border bg-card text-card-foreground shadow-[inset_0_0_0_2px_#2c1409]">
+        <h2 className="font-bold mb-2">메인 운영 블록</h2>
+        <section className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          <BitSelect value={environment.themePrimary} onValueChange={(value) => onSetThemePrimary(value as Theme)}>
+            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
+            <BitSelectContent>{THEME_OPTIONS.map((theme) => <BitSelectItem key={theme} value={theme}>{THEME_LABEL_MAP[theme]}</BitSelectItem>)}</BitSelectContent>
+          </BitSelect>
+          <BitSelect value={environment.themeSecondary ?? "__none"} onValueChange={(value) => onSetThemeSecondary(value === "__none" ? null : (value as Theme))}>
+            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
+            <BitSelectContent>
+              <BitSelectItem value="__none">없음</BitSelectItem>
+              {THEME_OPTIONS.filter((theme) => theme !== environment.themePrimary).map((theme) => <BitSelectItem key={theme} value={theme}>{THEME_LABEL_MAP[theme]}</BitSelectItem>)}
+            </BitSelectContent>
+          </BitSelect>
+          <BitSelect value={environment.foodProfile} onValueChange={(value) => onSetFoodProfile(value as FoodProfile)}>
+            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
+            <BitSelectContent>{FOOD_PROFILE_OPTIONS.map((foodProfile) => <BitSelectItem key={foodProfile} value={foodProfile}>{FOOD_PROFILE_LABEL_MAP[foodProfile]}</BitSelectItem>)}</BitSelectContent>
+          </BitSelect>
+          <BitSelect value={environment.cleanlinessBand} onValueChange={(value) => onSetCleanlinessBand(value as CleanlinessBand)}>
+            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
+            <BitSelectContent>{CLEANLINESS_BAND_OPTIONS.map((band) => <BitSelectItem key={band} value={band}>{band}</BitSelectItem>)}</BitSelectContent>
+          </BitSelect>
+          <BitSelect value={String(environment.facilityLevelByTheme[environment.themePrimary])} onValueChange={(value) => onSetFacilityLevel(environment.themePrimary, parseFacilityLevel(value))}>
+            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
+            <BitSelectContent>{FACILITY_LEVEL_OPTIONS.map((level) => <BitSelectItem key={level} value={String(level)}>Lv.{level}</BitSelectItem>)}</BitSelectContent>
+          </BitSelect>
+        </section>
+      </section>
 
-        <ul className={styles.historyList}>
-          {currentRun.history.map((item, index) => (
-            <li key={`${item.day}-${item.action}-${index}`}>
-              Day {item.day} - {CARE_ACTION_LABELS[item.action]}
-            </li>
-          ))}
-        </ul>
+      <section className="w-full max-w-[1448px] mt-2 px-6 py-4 border-4 border-border bg-card text-card-foreground shadow-[inset_0_0_0_2px_#2c1409] text-[clamp(26px,2vw,42px)] font-bold">
+        {isPokemonLoading && <p>로딩 중...</p>}
+        {isPokemonError && <p>{getErrorMessage(pokemonError)}</p>}
+        {!isPokemonLoading && !isPokemonError && <p>다음 행동을 선택하세요!</p>}
       </section>
     </main>
   );

@@ -6,6 +6,8 @@ interface PixiPetStageProps {
   imageSrc: string;
   alt: string;
   isPixelArt: boolean;
+  className?: string;
+  transparentBackground?: boolean;
 }
 
 const STAGE_SIZE = 180;
@@ -15,6 +17,8 @@ export function PixiPetStage({
   imageSrc,
   alt,
   isPixelArt,
+  className,
+  transparentBackground = false,
 }: PixiPetStageProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -55,6 +59,8 @@ export function PixiPetStage({
 
       const canvas = nextApp.canvas;
       canvas.className = styles.canvas;
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
       canvas.setAttribute("aria-label", alt);
       canvas.setAttribute("role", "img");
 
@@ -96,5 +102,11 @@ export function PixiPetStage({
     };
   }, [alt, imageSrc, isPixelArt]);
 
-  return <div ref={containerRef} className={styles.stage} />;
+  return (
+    <div
+      ref={containerRef}
+      className={className ? `${styles.stage} ${className}` : styles.stage}
+      style={transparentBackground ? { background: "transparent" } : undefined}
+    />
+  );
 }

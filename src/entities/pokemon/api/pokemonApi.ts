@@ -1,4 +1,5 @@
-import { requestCachedPokeApi } from "../../../shared/api/pokeApi";
+import { requestCachedPokeApi, requestPokeApi } from "../../../shared/api/pokeApi";
+import { getWithCache, ONE_DAY_MS } from "../../../shared/api/cache";
 import { GEN_1_SPECIES_IDS } from "../../../shared/constants/pokemon";
 import type {
   PokeApiEvolutionChain,
@@ -10,16 +11,13 @@ import type {
 } from "../../../shared/types/pokemon";
 import { getEvolutionLineSpeciesIds as parseEvolutionLineSpeciesIds } from "../../../features/evolution/model/evolution.logic";
 import { mapPokemonSummary } from "../model/pokemon.mapper";
-import { isAvailableMvpPokemon } from "../model/pokemon.utils";
+import {
+  isAvailableMvpPokemon,
+  isMissionSelectableSpecies,
+} from "../model/pokemon.utils";
 
 const POKEMON_CANDIDATE_BATCH_SIZE = 12;
 const POKEMON_CANDIDATE_BATCH_DELAY_MS = 120;
-
-function extractIdFromUrl(url: string): string {
-  const segments = url.split("/").filter(Boolean);
-
-  return segments.at(-1) ?? "unknown";
-}
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -41,12 +39,7 @@ export function getPokemonSpecies(id: number): Promise<PokeApiPokemonSpecies> {
 export function getEvolutionChainByUrl(
   url: string,
 ): Promise<PokeApiEvolutionChain> {
-  const evolutionChainId = extractIdFromUrl(url);
-
-  return requestCachedPokeApi<PokeApiEvolutionChain>(
-    `evolution-chain:${evolutionChainId}`,
-    url,
-  );
+  return requestPokeApi<PokeApiEvolutionChain>(url);
 }
 
 export function getNature(id: number): Promise<PokeApiNature> {
@@ -60,27 +53,33 @@ export function getItem(id: number): Promise<PokeApiItem> {
 export async function getEvolutionLineSpeciesIds(
   speciesId: number,
 ): Promise<number[]> {
-  const species = await getPokemonSpecies(speciesId);
-  const evolutionChain = await getEvolutionChainByUrl(
-    species.evolution_chain.url,
-  );
+  return getWithCache<number[]>({
+    key: `evolution-line:${speciesId}`,
+    ttlMs: ONE_DAY_MS,
+    fetcher: async () => {
+      const species = await getPokemonSpecies(speciesId);
+      const evolutionChain = await getEvolutionChainByUrl(
+        species.evolution_chain.url,
+      );
 
-  const evolutionLineSpeciesIds =
-    parseEvolutionLineSpeciesIds(evolutionChain);
+      const evolutionLineSpeciesIds =
+        parseEvolutionLineSpeciesIds(evolutionChain, speciesId);
 
-  if (evolutionLineSpeciesIds.length === 0) {
-    return [speciesId];
-  }
+      if (evolutionLineSpeciesIds.length === 0) {
+        return [speciesId];
+      }
 
-  const selectedIndex = evolutionLineSpeciesIds.findIndex(
-    (id) => id === speciesId,
-  );
+      const selectedIndex = evolutionLineSpeciesIds.findIndex(
+        (id) => id === speciesId,
+      );
 
-  if (selectedIndex < 0) {
-    return [speciesId];
-  }
+      if (selectedIndex < 0) {
+        return [speciesId];
+      }
 
-  return evolutionLineSpeciesIds.slice(selectedIndex);
+      return evolutionLineSpeciesIds.slice(selectedIndex);
+    },
+  });
 }
 
 export async function getPokemonSummary(id: number): Promise<PokemonSummary> {
@@ -96,15 +95,28 @@ async function getPokemonSummariesSafely(
   speciesIds: number[],
 ): Promise<PokemonSummary[]> {
   const settledResults = await Promise.allSettled(
-    speciesIds.map((speciesId) => getPokemonSummary(speciesId)),
+    speciesIds.map(async (speciesId) => {
+      const [pokemon, species] = await Promise.all([
+        getPokemon(speciesId),
+        getPokemonSpecies(speciesId),
+      ]);
+
+      if (!isMissionSelectableSpecies(species)) {
+        return null;
+      }
+
+      const summary = mapPokemonSummary(pokemon, species);
+      return isAvailableMvpPokemon(summary) ? summary : null;
+    }),
   );
 
   return settledResults
-    .filter((result): result is PromiseFulfilledResult<PokemonSummary> => {
-      return result.status === "fulfilled";
-    })
+    .filter(
+      (result): result is PromiseFulfilledResult<PokemonSummary | null> =>
+        result.status === "fulfilled",
+    )
     .map((result) => result.value)
-    .filter(isAvailableMvpPokemon);
+    .filter((candidate): candidate is PokemonSummary => candidate !== null);
 }
 
 export async function getGen1PokemonCandidates(): Promise<PokemonSummary[]> {

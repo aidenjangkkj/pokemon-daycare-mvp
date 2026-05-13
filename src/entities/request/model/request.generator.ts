@@ -2,7 +2,7 @@ import type { RequestCard } from "../../../shared/types/game";
 import type { PokemonSummary } from "../../../shared/types/pokemon";
 import { createId } from "../../../shared/utils/id";
 import { calculateRequestDifficulty } from "./request.difficulty";
-import { createRequestHints } from "./request.hint";
+import { createProgressiveRequestHints } from "./request.hint";
 import { calculateRequestWeight } from "./request.weight";
 import type { DaycareEnvironment, WeightedRequestCandidate } from "./request.types";
 
@@ -31,7 +31,10 @@ function toWeightedCandidate(
   return {
     pokemon,
     weight: calculateRequestWeight(pokemon, environment),
-    hints: createRequestHints(pokemon),
+    hints: createProgressiveRequestHints(
+      pokemon,
+      environment.registeredSpeciesIds.length,
+    ),
     estimatedCareLevel: calculateEstimatedCareLevel(pokemon),
     rewardBase: calculateRewardBase(pokemon),
     difficulty: calculateRequestDifficulty(pokemon),

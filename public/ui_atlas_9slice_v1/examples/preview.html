@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UI Atlas 9-Slice Preview</title>
+  <style>
+    body { margin:0; min-height:100vh; display:grid; place-items:center; background:#080a14; color:#fff2d3; font-family:system-ui,sans-serif; }
+    .wrap { width:min(100vw,1365px); aspect-ratio:1365/1024; position:relative; background:#5d3b2a; overflow:hidden; }
+    canvas { width:100%; height:100%; image-rendering:pixelated; display:block; }
+    .label { position:absolute; left:40px; bottom:34px; font-size:26px; }
+  </style>
+</head>
+<body>
+  <div class="wrap"><canvas id="ui" width="1365" height="1024"></canvas></div>
+<script>
+const frameUrl = '../atlas/ui-atlas.json';
+const nineUrl = '../atlas/ui-9slice.json';
+const imageUrl = '../atlas/ui-atlas.png';
+const canvas = document.getElementById('ui');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+function drawFrame(img, atlas, name, dx, dy, scale=1) {
+  const f = atlas.frames[name].frame;
+  ctx.drawImage(img, f.x, f.y, f.w, f.h, dx, dy, f.w*scale, f.h*scale);
+}
+
+function drawNine(img, atlas, defs, name, dx, dy, dw, dh) {
+  const def = defs[name];
+  const f = atlas.frames[def.frame].frame;
+  const s = def.slice;
+  const sx = f.x, sy = f.y, sw = f.w, sh = f.h;
+  const l=s.left, r=s.right, t=s.top, b=s.bottom;
+  const midSw = sw-l-r, midSh = sh-t-b;
+  const midDw = Math.max(0,dw-l-r), midDh = Math.max(0,dh-t-b);
+  ctx.drawImage(img,sx,sy,l,t,dx,dy,l,t);
+  ctx.drawImage(img,sx+l,sy,midSw,t,dx+l,dy,midDw,t);
+  ctx.drawImage(img,sx+sw-r,sy,r,t,dx+dw-r,dy,r,t);
+  ctx.drawImage(img,sx,sy+t,l,midSh,dx,dy+t,l,midDh);
+  ctx.drawImage(img,sx+l,sy+t,midSw,midSh,dx+l,dy+t,midDw,midDh);
+  ctx.drawImage(img,sx+sw-r,sy+t,r,midSh,dx+dw-r,dy+t,r,midDh);
+  ctx.drawImage(img,sx,sy+sh-b,l,b,dx,dy+dh-b,l,b);
+  ctx.drawImage(img,sx+l,sy+sh-b,midSw,b,dx+l,dy+dh-b,midDw,b);
+  ctx.drawImage(img,sx+sw-r,sy+sh-b,r,b,dx+dw-r,dy+dh-b,r,b);
+}
+
+function text(txt,x,y,size=28,align='left',color='#fff2d3') {
+  ctx.fillStyle = color; ctx.font = `700 ${size}px sans-serif`; ctx.textAlign = align; ctx.textBaseline='middle'; ctx.fillText(txt,x,y);
+}
+
+Promise.all([fetch(frameUrl).then(r=>r.json()), fetch(nineUrl).then(r=>r.json()), new Promise(res=>{const im=new Image(); im.onload=()=>res(im); im.src=imageUrl;})]).then(([atlas, defs, img])=>{
+  ctx.fillStyle='#5d3b2a'; ctx.fillRect(0,0,1365,1024);
+  drawNine(img, atlas, defs, 'message_dark_160', 20, 16, 1325, 88);
+  drawNine(img, atlas, defs, 'panel_cream_96', 22, 18, 92, 84); text('3',68,74,34,'center','#2c2330'); text('DAY',68,34,15,'center','#111');
+  drawFrame(img, atlas, 'icon_heart', 185, 40, 1.1); text('❤️❤️',235,62,30);
+  drawFrame(img, atlas, 'icon_drop', 465, 40, 1.1); text('1 / 2',520,62,30);
+  drawFrame(img, atlas, 'icon_bag', 775, 40, 1.1); text('0 / 1',830,62,30);
+  drawFrame(img, atlas, 'icon_coin', 1085, 40, 1.1); text('120',1140,62,30);
+  drawNine(img, atlas, defs, 'panel_dark_96', 20, 128, 282, 558);
+  drawNine(img, atlas, defs, 'panel_dark_96', 1032, 128, 313, 558);
+  ctx.fillStyle='#c89169'; ctx.fillRect(315,128,704,558); drawFrame(img, atlas, 'decor_room_bg', 330, 155, 1.42); drawFrame(img, atlas, 'decor_rug', 520, 510, 1.5);
+  text('🔴 이름',70,178,26); drawNine(img,atlas,defs,'text_slot_160',48,210,210,48); text('???',153,235,26,'center','#2c2330');
+  text('🌿 레벨',70,302,26); drawNine(img,atlas,defs,'text_slot_160',48,334,210,48); text('Lv. 5',153,359,26,'center','#2c2330');
+  text('🧬 타입',70,426,26); drawNine(img,atlas,defs,'text_slot_160',48,458,210,48); text('???',153,483,26,'center','#2c2330');
+  text('🥚 상태',70,550,26); drawNine(img,atlas,defs,'text_slot_160',48,582,210,48); text('알',153,607,26,'center','#2c2330');
+  text('💜 상태',1080,178,26);
+  const stats=[['❤️ 체력','bar_green','72',220],['🙂 기분','bar_yellow','60',300],['⚡ 에너지','bar_yellow','50',380],['🛡️ 청결','bar_blue','65',460],['💤 휴식','bar_purple','70',540]];
+  stats.forEach(([label,bar,val,y])=>{ text(label,1085,y,24); drawFrame(img,atlas,bar,1145,y+24,0.78); text(val,1280,y+37,24); });
+  const btns=[['button_red','icon_fork','먹이 주기'],['button_green','icon_ball','놀아주기'],['button_yellow','icon_wash','씻기기'],['button_blue','icon_bed','쉬게 하기'],['button_purple','icon_mountain','탐험 보내기']];
+  btns.forEach((b,i)=>{ const x=20+i*267; drawNine(img,atlas,defs,b[0],x,704,252,104); drawFrame(img,atlas,b[1],x+28,733,1); text(b[2],x+150,756,30,'center'); });
+  drawNine(img,atlas,defs,'button_orange',330,836,650,70); drawFrame(img,atlas,'icon_sun',520,848,1); text('하루 종료',690,872,32,'center');
+  drawNine(img,atlas,defs,'button_danger',1020,836,315,70); drawFrame(img,atlas,'icon_exit',1060,848,1); text('런 포기',1185,872,32,'center');
+  drawNine(img,atlas,defs,'message_dark_160',20,925,1325,82); text('다음 행동을 선택하세요!',65,966,28);
+});
+</script>
+</body>
+</html>

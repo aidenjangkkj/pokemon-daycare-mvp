@@ -61,7 +61,10 @@ interface RunStore {
   latestResult: RunRecord | null;
   hydrateFromStorage: () => void;
   startRun: (speciesId: number) => Promise<void>;
-  performAction: (action: CareActionType) => void;
+  performAction: (
+    action: CareActionType,
+    options?: { expeditionMode?: "auto" | "direct"; miniGameSuccess?: boolean },
+  ) => void;
   endDay: () => void;
   finishCurrentRun: () => void;
   clearRun: () => void;
@@ -245,7 +248,7 @@ export const useRunStore = create<RunStore>((set) => ({
     });
   },
 
-  performAction: (action) => {
+  performAction: (action, options) => {
     set((state) => {
       if (!state.currentRun) return state;
       if (state.isRestMode) return state;
@@ -284,12 +287,14 @@ export const useRunStore = create<RunStore>((set) => ({
       const expeditionResult =
         action === "expedition"
           ? calculateExpeditionResult({
+              mode: options?.expeditionMode ?? "auto",
               actionSuccessBase: 0.65,
               energy: state.currentRun.pet.energy,
               pokemonTypes: state.currentRun.pet.types,
               natureDisposition: state.currentRun.pet.natureDisposition,
               themePrimary: environment.themePrimary,
               themeSecondary: environment.themeSecondary,
+              miniGameSuccess: options?.miniGameSuccess,
             })
           : null;
 
@@ -302,10 +307,13 @@ export const useRunStore = create<RunStore>((set) => ({
               ...state.currentRun.expeditionLogs,
               {
                 day: state.currentRun.day,
+                mode: options?.expeditionMode ?? "auto",
                 successChance: expeditionResult.successChance,
                 success: expeditionResult.success,
                 bonusCurrencyMultiplier:
                   expeditionResult.bonusCurrencyMultiplier,
+                bonusItemMultiplier:
+                  expeditionResult.bonusItemMultiplier,
                 bonusOperationPoint:
                   expeditionResult.bonusOperationPoint,
               },
