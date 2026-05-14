@@ -6,8 +6,16 @@ import type {
   FacilityLevel,
   FoodProfile,
 } from "../../shared/constants/theme";
-import { FOOD_PROFILE_LABEL_MAP, THEME_LABEL_MAP } from "../../shared/constants/theme";
-import { CLEANLINESS_BAND_OPTIONS, FACILITY_LEVEL_OPTIONS, FOOD_PROFILE_OPTIONS, THEME_OPTIONS } from "../../shared/constants/ui";
+import {
+  FOOD_PROFILE_LABEL_MAP,
+  THEME_LABEL_MAP,
+} from "../../shared/constants/theme";
+import {
+  CLEANLINESS_BAND_OPTIONS,
+  FACILITY_LEVEL_OPTIONS,
+  FOOD_PROFILE_OPTIONS,
+  THEME_OPTIONS,
+} from "../../shared/constants/ui";
 import { PixiPetStage } from "../../widgets/pixi-stage/PixiPetStage";
 import { StatusPanel } from "../../widgets/status-panel/StatusPanel";
 import { Block } from "@/components/ui/8bit/block";
@@ -16,7 +24,13 @@ import {
   Card as BitCard,
   CardContent as BitCardContent,
 } from "@/components/ui/8bit/card";
-import { Select as BitSelect, SelectContent as BitSelectContent, SelectItem as BitSelectItem, SelectTrigger as BitSelectTrigger, SelectValue as BitSelectValue } from "@/components/ui/8bit/select";
+import {
+  Select as BitSelect,
+  SelectContent as BitSelectContent,
+  SelectItem as BitSelectItem,
+  SelectTrigger as BitSelectTrigger,
+  SelectValue as BitSelectValue,
+} from "@/components/ui/8bit/select";
 
 interface CareMainPageProps {
   currentRun: RunState;
@@ -83,118 +97,255 @@ export function CareMainPage({
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col items-center p-2">
-      <section className="w-full max-w-[1448px] aspect-[1448/1086] p-3 grid grid-cols-[320px_1fr_320px] grid-rows-[110px_1fr_110px_90px] gap-3">
-        <BitCard className="col-span-3 bg-card text-card-foreground border-border" font="retro">
-          <BitCardContent className="grid grid-cols-[1.2fr_1fr_1fr_1fr_0.8fr] gap-2 p-2!">
-            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">DAY {currentRun.day}</Block>
-            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">{"♥".repeat(Math.max(0, 3 - currentRun.failCount))}</Block>
-            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">{actionsToday} / 2</Block>
-            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">{expeditionCountToday} / 1</Block>
-            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">{currentRun.weeklyCarePoint * 15}</Block>
+      <section className="w-full max-w-[1448px] aspect-1448/1086 p-3 grid grid-cols-[320px_1fr_320px] grid-rows-[110px_1fr_110px_90px] gap-3">
+        <div className="col-span-3">
+          <BitCard font="retro">
+            <BitCardContent className="grid grid-cols-[1.2fr_1fr_1fr_1fr_0.8fr] gap-2 p-2">
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">
+              DAY {currentRun.day}
+            </Block>
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">
+              {"♥".repeat(Math.max(0, 3 - currentRun.failCount))}
+            </Block>
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">
+              {actionsToday} / 2
+            </Block>
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">
+              {expeditionCountToday} / 1
+            </Block>
+            <Block className="flex items-center justify-center font-bold text-[clamp(22px,1.8vw,34px)]">
+              {currentRun.weeklyCarePoint * 15}
+            </Block>
+            </BitCardContent>
+          </BitCard>
+        </div>
+
+        <BitCard font="retro">
+          <BitCardContent className="p-4 grid gap-2">
+            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">
+              이름
+            </Block>
+            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">
+              {pokemonSummary?.localizedName ?? "???"}
+            </Block>
+            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">
+              레벨
+            </Block>
+            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">
+              Lv. {Math.min(99, currentRun.day)}
+            </Block>
+            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">
+              타입
+            </Block>
+            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">
+              {pokemonSummary?.types.join(" / ") ?? "???"}
+            </Block>
+            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">
+              상태
+            </Block>
+            <Block className="bg-primary text-primary-foreground px-3 py-2 font-bold truncate">
+              {getStageLabel(currentRun.pet.stage)}
+            </Block>
           </BitCardContent>
         </BitCard>
 
-        <BitCard className="bg-card text-card-foreground border-border" font="retro">
-          <BitCardContent className="p-4! grid gap-2">
-            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">이름</Block>
-            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">{pokemonSummary?.localizedName ?? "???"}</Block>
-            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">레벨</Block>
-            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">Lv. {Math.min(99, currentRun.day)}</Block>
-            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">타입</Block>
-            <Block className="bg-muted text-foreground px-3 py-2 font-bold truncate">{pokemonSummary?.types.join(" / ") ?? "???"}</Block>
-            <Block className="font-bold text-[clamp(20px,1.6vw,28px)]">상태</Block>
-            <Block className="bg-primary text-primary-foreground px-3 py-2 font-bold truncate">{getStageLabel(currentRun.pet.stage)}</Block>
+        <BitCard font="retro">
+          <BitCardContent
+            className="relative p-0 w-full h-full overflow-hidden bg-center bg-contain bg-no-repeat"
+            style={{ backgroundImage: "url('/assets/background.png')" }}
+          >
+            <Block className="absolute left-[34%] bottom-[12%] w-[32%] h-[24%]">
+              {imageSrc && (
+                <PixiPetStage
+                  imageSrc={imageSrc}
+                  alt={pokemonSummary?.localizedName ?? "pokemon"}
+                  isPixelArt
+                  className="w-full h-full"
+                  transparentBackground
+                />
+              )}
+            </Block>
           </BitCardContent>
         </BitCard>
 
-        <section
-          className="relative overflow-hidden border-4 border-border shadow-[inset_0_0_0_2px_#2c1409] bg-center bg-cover"
-          style={{
-            backgroundImage:
-              "url('/assets/room-bg-generated.svg')",
-          }}
-        >
-          <Block
-            className="absolute left-[16%] bottom-[7%] w-[68%] h-[32%] bg-center bg-contain bg-no-repeat"
-            style={{
-              backgroundImage: "url('/assets/rug-generated.svg')",
-            }}
-          />
-          <Block className="absolute left-[34%] bottom-[12%] w-[32%] h-[24%]">
-            {imageSrc && (
-              <PixiPetStage
-                imageSrc={imageSrc}
-                alt={pokemonSummary?.localizedName ?? "pokemon"}
-                isPixelArt
-                className="w-full h-full bg-transparent!"
-                transparentBackground
-              />
-            )}
-          </Block>
-        </section>
-
-        <BitCard className="bg-card text-card-foreground border-border" font="retro">
-          <BitCardContent className="p-4! flex flex-col justify-around gap-2">
-            <StatusPanel label="체력" value={currentRun.pet.hunger} colorClassName="bg-lime-500" />
-            <StatusPanel label="기분" value={currentRun.pet.mood} colorClassName="bg-amber-400" />
-            <StatusPanel label="에너지" value={currentRun.pet.energy} colorClassName="bg-yellow-400" />
-            <StatusPanel label="청결" value={currentRun.pet.cleanliness} colorClassName="bg-sky-500" />
-            <StatusPanel label="휴식" value={Math.max(0, 100 - currentRun.failCount * 10)} colorClassName="bg-purple-500" />
+        <BitCard font="retro">
+          <BitCardContent className="p-4 flex flex-col justify-around gap-2">
+            <StatusPanel
+              label="체력"
+              value={currentRun.pet.hunger}
+              colorClassName="bg-lime-500"
+            />
+            <StatusPanel
+              label="기분"
+              value={currentRun.pet.mood}
+              colorClassName="bg-amber-400"
+            />
+            <StatusPanel
+              label="에너지"
+              value={currentRun.pet.energy}
+              colorClassName="bg-yellow-400"
+            />
+            <StatusPanel
+              label="청결"
+              value={currentRun.pet.cleanliness}
+              colorClassName="bg-sky-500"
+            />
+            <StatusPanel
+              label="휴식"
+              value={Math.max(0, 100 - currentRun.failCount * 10)}
+              colorClassName="bg-purple-500"
+            />
           </BitCardContent>
         </BitCard>
 
         <section className="col-span-3 grid grid-cols-5 gap-2">
-          <BitButton font="retro" className="w-full h-full bg-red-500 text-white rounded-none" onClick={() => onPerformAction("feedBerry")} disabled={isRestMode || isFinalEvolution}>먹이 주기</BitButton>
-          <BitButton font="retro" className="w-full h-full bg-green-600 text-white rounded-none" onClick={() => onPerformAction("trainMove")} disabled={isRestMode || isFinalEvolution}>놀아주기</BitButton>
-          <BitButton font="retro" className="w-full h-full bg-amber-500 text-white rounded-none" onClick={() => onPerformAction("brushCare")} disabled={isRestMode || isFinalEvolution}>씻기기</BitButton>
-          <BitButton font="retro" className="w-full h-full bg-sky-500 text-white rounded-none" onClick={() => onPerformAction("rest")} disabled={isRestMode || isFinalEvolution}>쉬게 하기</BitButton>
-          <BitButton font="retro" className="w-full h-full bg-purple-500 text-white rounded-none" onClick={() => onPerformAction("expedition")} disabled={isRestMode || isFinalEvolution}>탐험 보내기</BitButton>
+          <BitButton font="retro" onClick={() => onPerformAction("feedBerry")} disabled={isRestMode || isFinalEvolution}>
+            먹이 주기
+          </BitButton>
+          <BitButton font="retro" onClick={() => onPerformAction("trainMove")} disabled={isRestMode || isFinalEvolution}>
+            놀아주기
+          </BitButton>
+          <BitButton font="retro" onClick={() => onPerformAction("brushCare")} disabled={isRestMode || isFinalEvolution}>
+            씻기기
+          </BitButton>
+          <BitButton font="retro" onClick={() => onPerformAction("rest")} disabled={isRestMode || isFinalEvolution}>
+            쉬게 하기
+          </BitButton>
+          <BitButton font="retro" onClick={() => onPerformAction("expedition")} disabled={isRestMode || isFinalEvolution}>
+            탐험 보내기
+          </BitButton>
         </section>
 
         <section className="col-span-3 grid grid-cols-[2fr_1fr] gap-2">
           {isFinalEvolution ? (
-            <BitButton font="retro" className="w-full h-full bg-orange-500 text-white rounded-none" onClick={onFinishRun}>결과 확인</BitButton>
+            <BitButton font="retro" onClick={onFinishRun}>
+              결과 확인
+            </BitButton>
           ) : (
-            <BitButton font="retro" className="w-full h-full bg-orange-500 text-white rounded-none" onClick={onEndDay} disabled={isRestMode}>하루 종료</BitButton>
+            <BitButton font="retro" onClick={onEndDay} disabled={isRestMode}>
+              하루 종료
+            </BitButton>
           )}
-          <BitButton font="retro" className="w-full h-full bg-red-700 text-white rounded-none" onClick={onClearRun}>런 포기</BitButton>
+          <BitButton font="retro" onClick={onClearRun}>
+            런 포기
+          </BitButton>
         </section>
       </section>
 
-      <section className="w-full max-w-[1448px] mt-2 p-3 border-4 border-border bg-card text-card-foreground shadow-[inset_0_0_0_2px_#2c1409]">
-        <h2 className="font-bold mb-2">메인 운영 블록</h2>
-        <section className="grid grid-cols-2 md:grid-cols-5 gap-2">
-          <BitSelect value={environment.themePrimary} onValueChange={(value) => onSetThemePrimary(value as Theme)}>
-            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
-            <BitSelectContent>{THEME_OPTIONS.map((theme) => <BitSelectItem key={theme} value={theme}>{THEME_LABEL_MAP[theme]}</BitSelectItem>)}</BitSelectContent>
-          </BitSelect>
-          <BitSelect value={environment.themeSecondary ?? "__none"} onValueChange={(value) => onSetThemeSecondary(value === "__none" ? null : (value as Theme))}>
-            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
-            <BitSelectContent>
-              <BitSelectItem value="__none">없음</BitSelectItem>
-              {THEME_OPTIONS.filter((theme) => theme !== environment.themePrimary).map((theme) => <BitSelectItem key={theme} value={theme}>{THEME_LABEL_MAP[theme]}</BitSelectItem>)}
-            </BitSelectContent>
-          </BitSelect>
-          <BitSelect value={environment.foodProfile} onValueChange={(value) => onSetFoodProfile(value as FoodProfile)}>
-            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
-            <BitSelectContent>{FOOD_PROFILE_OPTIONS.map((foodProfile) => <BitSelectItem key={foodProfile} value={foodProfile}>{FOOD_PROFILE_LABEL_MAP[foodProfile]}</BitSelectItem>)}</BitSelectContent>
-          </BitSelect>
-          <BitSelect value={environment.cleanlinessBand} onValueChange={(value) => onSetCleanlinessBand(value as CleanlinessBand)}>
-            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
-            <BitSelectContent>{CLEANLINESS_BAND_OPTIONS.map((band) => <BitSelectItem key={band} value={band}>{band}</BitSelectItem>)}</BitSelectContent>
-          </BitSelect>
-          <BitSelect value={String(environment.facilityLevelByTheme[environment.themePrimary])} onValueChange={(value) => onSetFacilityLevel(environment.themePrimary, parseFacilityLevel(value))}>
-            <BitSelectTrigger><BitSelectValue /></BitSelectTrigger>
-            <BitSelectContent>{FACILITY_LEVEL_OPTIONS.map((level) => <BitSelectItem key={level} value={String(level)}>Lv.{level}</BitSelectItem>)}</BitSelectContent>
-          </BitSelect>
-        </section>
-      </section>
+      <div className="w-full max-w-[1448px] mt-2">
+      <BitCard font="retro">
+        <BitCardContent>
+          <h2 className="font-bold mb-2">메인 운영 블록</h2>
+          <section className="grid grid-cols-2 md:grid-cols-5 gap-2">
+            <BitSelect
+              value={environment.themePrimary}
+              onValueChange={(value) => onSetThemePrimary(value as Theme)}
+            >
+              <BitSelectTrigger>
+                <BitSelectValue />
+              </BitSelectTrigger>
+              <BitSelectContent>
+                {THEME_OPTIONS.map((theme) => (
+                  <BitSelectItem key={theme} value={theme}>
+                    {THEME_LABEL_MAP[theme]}
+                  </BitSelectItem>
+                ))}
+              </BitSelectContent>
+            </BitSelect>
+            <BitSelect
+              value={environment.themeSecondary ?? "__none"}
+              onValueChange={(value) =>
+                onSetThemeSecondary(
+                  value === "__none" ? null : (value as Theme),
+                )
+              }
+            >
+              <BitSelectTrigger>
+                <BitSelectValue />
+              </BitSelectTrigger>
+              <BitSelectContent>
+                <BitSelectItem value="__none">없음</BitSelectItem>
+                {THEME_OPTIONS.filter(
+                  (theme) => theme !== environment.themePrimary,
+                ).map((theme) => (
+                  <BitSelectItem key={theme} value={theme}>
+                    {THEME_LABEL_MAP[theme]}
+                  </BitSelectItem>
+                ))}
+              </BitSelectContent>
+            </BitSelect>
+            <BitSelect
+              value={environment.foodProfile}
+              onValueChange={(value) => onSetFoodProfile(value as FoodProfile)}
+            >
+              <BitSelectTrigger>
+                <BitSelectValue />
+              </BitSelectTrigger>
+              <BitSelectContent>
+                {FOOD_PROFILE_OPTIONS.map((foodProfile) => (
+                  <BitSelectItem key={foodProfile} value={foodProfile}>
+                    {FOOD_PROFILE_LABEL_MAP[foodProfile]}
+                  </BitSelectItem>
+                ))}
+              </BitSelectContent>
+            </BitSelect>
+            <BitSelect
+              value={environment.cleanlinessBand}
+              onValueChange={(value) =>
+                onSetCleanlinessBand(value as CleanlinessBand)
+              }
+            >
+              <BitSelectTrigger>
+                <BitSelectValue />
+              </BitSelectTrigger>
+              <BitSelectContent>
+                {CLEANLINESS_BAND_OPTIONS.map((band) => (
+                  <BitSelectItem key={band} value={band}>
+                    {band}
+                  </BitSelectItem>
+                ))}
+              </BitSelectContent>
+            </BitSelect>
+            <BitSelect
+              value={String(
+                environment.facilityLevelByTheme[environment.themePrimary],
+              )}
+              onValueChange={(value) =>
+                onSetFacilityLevel(
+                  environment.themePrimary,
+                  parseFacilityLevel(value),
+                )
+              }
+            >
+              <BitSelectTrigger>
+                <BitSelectValue />
+              </BitSelectTrigger>
+              <BitSelectContent>
+                {FACILITY_LEVEL_OPTIONS.map((level) => (
+                  <BitSelectItem key={level} value={String(level)}>
+                    Lv.{level}
+                  </BitSelectItem>
+                ))}
+              </BitSelectContent>
+            </BitSelect>
+          </section>
+        </BitCardContent>
+      </BitCard>
+      </div>
 
-      <section className="w-full max-w-[1448px] mt-2 px-6 py-4 border-4 border-border bg-card text-card-foreground shadow-[inset_0_0_0_2px_#2c1409] text-[clamp(26px,2vw,42px)] font-bold">
-        {isPokemonLoading && <p>로딩 중...</p>}
-        {isPokemonError && <p>{getErrorMessage(pokemonError)}</p>}
-        {!isPokemonLoading && !isPokemonError && <p>다음 행동을 선택하세요!</p>}
-      </section>
+      <div className="w-full max-w-[1448px] mt-2">
+      <BitCard font="retro">
+        <BitCardContent>
+          <div className="px-6 py-4 text-[clamp(26px,2vw,42px)] font-bold">
+          {isPokemonLoading && <p>로딩 중...</p>}
+          {isPokemonError && <p>{getErrorMessage(pokemonError)}</p>}
+          {!isPokemonLoading && !isPokemonError && (
+            <p>다음 행동을 선택하세요!</p>
+          )}
+          </div>
+        </BitCardContent>
+      </BitCard>
+      </div>
     </main>
   );
 }

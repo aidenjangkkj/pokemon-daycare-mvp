@@ -16,7 +16,6 @@ export function BottomActionBar({
       <BitButton
         type="button"
         font="retro"
-        className={`w-full h-14 text-white rounded-none ${isBoard ? "bg-[#3f8cae]" : "bg-[#4f912b]"}`}
         onClick={isBoard ? onOpenMain : onOpenBoard}
       >
         {isBoard ? "메인으로" : "게시판으로"}
@@ -24,7 +23,6 @@ export function BottomActionBar({
       <BitButton
         type="button"
         font="retro"
-        className="w-full h-14 bg-[#8a5ca9] text-white rounded-none"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
         상단 이동
